@@ -1,9 +1,9 @@
-drop table MAGASIN;
-drop table EMPLOYE;
-drop table CATEGORIE;
-drop table PRODUIT;
-drop table POSSEDE;
 drop table VEND;
+drop table POSSEDE;
+drop table PRODUIT;
+drop table EMPLOYE;
+drop table MAGASIN;
+drop table CATEGORIE;
 
 CREATE TABLE CATEGORIE
 (
