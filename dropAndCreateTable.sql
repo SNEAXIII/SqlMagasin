@@ -25,7 +25,7 @@ create table PRODUIT
 
 create table MAGASIN
 (
-    No_magasin      int identity(1,1) not null,
+    No_magasin      int /*identity(1,1)*/ not null,
     Nom_magasin     varchar(25) not null,
     No_rue_magasin  varchar(25),
     Lib_rue_magasin varchar(50),
@@ -36,7 +36,7 @@ create table MAGASIN
 
 create table EMPLOYE
 (
-    No_employé      int identity(1,1) not null,
+    No_employé      int /*identity(1,1)*/ not null,
     Nom_employé     varchar(25) not null,
     No_rue_employé  varchar(25),
     Lib_rue_employé varchar(50),
