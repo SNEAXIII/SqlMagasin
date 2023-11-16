@@ -10,7 +10,10 @@ BEGIN
         @Lib_rue_magasin char(50),
         @CP_magasin char(5),
         @Ville_magasin char(30),
-        @action char(1)
+        @action char(1),
+        @mess char(50)
+--     todo remove mess
+    set @mess = N'Le CP doit être compris entre 01000 et 95999 !'
 
     IF EXISTS (SELECT * FROM DELETED)
         BEGIN
@@ -31,7 +34,7 @@ BEGIN
 
     IF NOT CAST(@CP_magasin as INT) BETWEEN 1000 AND 95999
         BEGIN
-            RAISERROR (N'Le CP doit être compris entre 01000 et 95999 !',16,1)
+            RAISERROR (@mess,16,1)
         END
     ELSE IF @action = 'I'
         BEGIN
