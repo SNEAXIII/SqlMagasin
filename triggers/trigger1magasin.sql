@@ -3,49 +3,54 @@ CREATE TRIGGER [ctrl_CP]
     instead of INSERT, UPDATE AS
 BEGIN
     SET NOCOUNT ON
-    DECLARE @Code_produit char(5),
-        @No_employé int,
-        @Date_vente date,
-        @Qté_vendue float,
+    DECLARE
+        @No_magasin int,
+        @Nom_magasin char(40),
+        @No_rue_magasin char(10),
+        @Lib_rue_magasin char(50),
+        @CP_magasin char(5),
+        @Ville_magasin char(30),
         @action char(1)
 
     IF EXISTS (SELECT * FROM DELETED)
-    BEGIN
-        SET @action = 'U'
-    END
-    ELSE
-    BEGIN
-        SET @action = 'I'
-    END
-
-    SELECT @Code_produit = I.No_magasin,
-           @No_employé = I.Nom_magasin,
-           @Date_vente = I.No_rue_magasin,
-           @Qté_vendue = I.Lib_rue_magasin,
-           @Qté_vendue = I.CPw
-           @Qté_vendue = I.Lib_rue_magasin
-    FROM inserted AS I
-    IF @Qté_vendue <= 0
-    BEGIN
-        RAISERROR (N'La quantité vendue doit être > 0 !',16,1)
-    END
-    ELSE
-    BEGIN
-        IF @action = 'I'
         BEGIN
-            INSERT INTO VEND
-                VALUES (@Code_produit, @No_employé, @Date_vente, @Qté_vendue)
-                    END
-            ELSE
-            BEGIN
-                UPDATE VEND
-                SET Qté_vendue =@Qté_vendue
-                WHERE Code_produit = @Code_produit
-                  AND No_employé = @No_employé
-                  AND Date_vente = @Date_vente
-            END
-            END
+            SET @action = 'U'
         END
+    ELSE
+        BEGIN
+            SET @action = 'I'
+        END
+
+    SELECT @No_magasin = I.No_magasin,
+           @Nom_magasin = I.Nom_magasin,
+           @No_rue_magasin = I.No_rue_magasin,
+           @Lib_rue_magasin = I.Lib_rue_magasin,
+           @CP_magasin = I.CP_magasin,
+           @Ville_magasin = I.Ville_magasin
+    FROM inserted AS I
+
+    IF NOT CAST(@CP_magasin as INT) BETWEEN 1000 AND 95999
+        BEGIN
+            RAISERROR (N'Le CP doit être compris entre 01000 et 95999 !',16,1)
+        END
+    ELSE IF @action = 'I'
+        BEGIN
+            INSERT INTO MAGASIN
+            VALUES (
+                    @Nom_magasin,
+                    @No_rue_magasin,
+                    @Lib_rue_magasin,
+                    @CP_magasin,
+                    @Ville_magasin
+                   )
+        END
+    ELSE IF @action = 'U'
+        BEGIN
+            UPDATE MAGASIN
+            SET CP_magasin =@CP_magasin
+            WHERE No_magasin = @No_magasin
+        END
+END
 
 
 
