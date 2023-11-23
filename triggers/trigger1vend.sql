@@ -28,21 +28,34 @@ BEGIN
             RAISERROR (N'La quantité vendue doit être > 0 !',16,1)
         END
     ELSE
-        BEGIN
-            IF @action = 'I'
+        IF @Date_vente > (SELECT CAST(GETDATE() AS date))
+            BEGIN
+                RAISERROR (N'La doit etre saisie correctement !',16,1)
+            END
+        ELSE
+            IF NOT (SELECT No_magasin FROM EMPLOYE E WHERE E.No_employé = @No_employé) in
+               (SELECT No_magasin FROM POSSEDE P WHERE Code_produit = @Code_produit)
                 BEGIN
-                    INSERT INTO VEND
-                    VALUES (@Code_produit, @No_employé, @Date_vente, @Qté_vendue)
+                    declare @mess char(100);
+                    set @mess = N'L' + char(39) + 'employe ne peut vendre que des produits present dans son magasin!';
+                    RAISERROR (@mess,16,1)
                 END
             ELSE
                 BEGIN
-                    UPDATE VEND
-                    SET Qté_vendue =@Qté_vendue
-                    WHERE Code_produit = @Code_produit
-                      AND No_employé = @No_employé
-                      AND Date_vente = @Date_vente
+                    IF @action = 'I'
+                        BEGIN
+                            INSERT INTO VEND
+                            VALUES (@Code_produit, @No_employé, @Date_vente, @Qté_vendue)
+                        END
+                    ELSE
+                        BEGIN
+                            UPDATE VEND
+                            SET Qté_vendue =@Qté_vendue
+                            WHERE Code_produit = @Code_produit
+                              AND No_employé = @No_employé
+                              AND Date_vente = @Date_vente
+                        END
                 END
-        END
 END
 
 
