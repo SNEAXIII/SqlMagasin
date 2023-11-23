@@ -1,51 +1,71 @@
-CREATE TRIGGER [ctrl_CP]
-    ON [MAGASIN]
-    INSTEAD OF INSERT, UPDATE AS
+CREATE TRIGGER [dbo].[crtl_affectationCatEmploye] ON [dbo].[AFFECTATION]
+    instead of INSERT, UPDATE
+    AS
+
+
 BEGIN
-    SET NOCOUNT ON;
+    SET NOCOUNT ON
     DECLARE
-        @No_magasin INT,
-        @Nom_magasin CHAR(40),
-        @No_rue_magasin CHAR(10),
-        @Lib_rue_magasin CHAR(50),
-        @CP_magasin CHAR(5),
-        @Ville_magasin CHAR(30),
-        @action CHAR(1);
+        @No_employé integer,
+        @Cat char(2),
+        @action char(1),
+        @Erreur char(1),
+        @nb_cat_employe integer
 
-    IF EXISTS (SELECT * FROM DELETED)
+
+    SET @Erreur='N'
+
+
+
+    IF EXISTS(SELECT * FROM DELETED)
         BEGIN
-            SET @action = 'U';
+            SET @action='U'
         END
     ELSE
         BEGIN
-            SET @action = 'I';
-        END;
-
-    SELECT @No_magasin = I.No_magasin,
-           @Nom_magasin = I.Nom_magasin,
-           @No_rue_magasin = I.No_rue_magasin,
-           @Lib_rue_magasin = I.Lib_rue_magasin,
-           @CP_magasin = I.CP_magasin,
-           @Ville_magasin = I.Ville_magasin
-    FROM inserted AS I;
-
-    IF NOT (CAST(@CP_magasin AS INT) BETWEEN 1000 AND 95999)
-        BEGIN
-            RAISERROR (N'Le CP doit être compris entre 01000 et 95999 !', 16, 1);
+            SET @action='I'
         END
-    ELSE
+
+
+
+
+    SELECT @No_employé = I.No_employé ,  @cat = I.Cat
+    FROM inserted AS I
+
+
+    SELECT @nb_cat_employe = COUNT(cat) from AFFECTATION where  cat = @cat
+
+
+
+    IF @nb_cat_employe >= 3
         BEGIN
-                    CASE @action
-                WHEN 'I' THEN INSERT INTO MAGASIN
-                              VALUES (
-                                         @Nom_magasin,
-                                         @No_rue_magasin,
-                                         @Lib_rue_magasin,
-                                         @CP_magasin,
-                                         @Ville_magasin
-                                     );
-                    WHEN 'U' THEN UPDATE MAGASIN
-                                  SET CP_magasin = @CP_magasin
-                                  WHERE No_magasin = @No_magasin;
+            RAISERROR(N'Le produit doit être au max dans 3 magasin',16,1)
+            SET @Erreur='O'
+        END
+
+
+    IF @Erreur='N'
+        BEGIN
+            IF @action = 'I'
+                BEGIN
+                    INSERT INTO AFFECTATION
+                    VALUES (@No_employé , @Cat)
+                END
+            ELSE
+                BEGIN
+                    RAISERROR('Upadate imposible',16,1)
+
+
+                END
         END
 END
+
+
+
+
+
+
+
+
+
+
