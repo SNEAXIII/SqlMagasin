@@ -5,8 +5,9 @@ BEGIN
     SET NOCOUNT ON
     DECLARE
         @No_employé varchar(5),
-        @CAT int,
+        @Cat int,
         @Nb int,
+        @message varchar(255),
         @action char(1)
 
     IF EXISTS (SELECT * FROM DELETED)
@@ -20,23 +21,45 @@ BEGIN
 
 
     SELECT @No_employé = I.No_Employé,
-           @CAT = I.Cat
+           @Cat = I.Cat
     FROM inserted AS I
 
---     todo finish that shit
-    select P.Code_catégorie from PRODUIT P inner join
-    IF @Nb >= 3
+    SELECT @Nb = count(*)
+    FROM AFFECTATION
+    where @Cat = Cat;
+
+    IF @Nb < 2
         BEGIN
-            RAISERROR (N'Le produit existe déja dans 3 magasins.',16,1)
-        end
-    ELSE IF @action='U'
-        BEGIN
-            RAISERROR (N'Un enregistrement de la table POSSEDE ne peux pas etre modifié.',16,1)
-        end
+            SET @message = N'L' + char(39) + N'employé numéro ' + CAST(@No_employé AS NVARCHAR(50)) +
+                           N'ne peux pas être spécialisé dans 2 catégories'
+            RAISERROR (@message,16,1)
+        END
+
     ELSE
-        BEGIN
-            INSERT Into POSSEDE VALUES (@No_magasin,@Code_produit)
-        end
+        IF not EXISTS (SELECT p.Code_catégorie
+                       FROM produit p
+                                inner join dbo.POSSEDE P2 on p.Code_produit = P2.Code_produit
+                       where No_magasin = (SELECT No_magasin FROM EMPLOYE e where e.No_employé = @No_employé))
+            BEGIN
+                set @message = N'L' + char(39) + N'employé ne peux pas être spécialiste d' + char(39) +
+                               N'une catégorie qui n' + char(39) + 'est pas dans son magasin'
+                RAISERROR (@message,16,1)
+            END
+
+        ELSE
+            IF @action = 'U'
+                BEGIN
+                    UPDATE AFFECTATION
+                    SET No_employé = @No_employé,
+                        Cat        = @Cat
+                    WHERE
+                        No_employé = @No_employé
+                        and Cat = @Cat
+                END
+            ELSE
+                BEGIN
+                    INSERT Into AFFECTATION VALUES (@No_employé, @Cat)
+                END
 END
 
 
