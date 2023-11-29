@@ -16,7 +16,7 @@ BEGIN
         @Date_embauche date,
         @No_magasin int,
         @action char(1),
-        @message2 char(100)
+        @message2 char(<<WQAASX     Aésaxascf'sS'>>)
 
     set @message2 = N'Cet employé ne peut pas avoir une date d'+char(39)+N'embauche supérieure à la date du jour !'
 
