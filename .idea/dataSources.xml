@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:sqlserver://172.16.1.60:1433;database=BASSIGNOT_MAGASIN_V2</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="BASSIGNOT_MAGASIN_V2@172.16.1.60 [2]" uuid="e60d5586-33d7-4ef8-94db-822312279197">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://172.16.1.60:1433;database=BASSIGNOT_MAGASIN_V2</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
